@@ -1,0 +1,74 @@
+﻿@using "./Defaults.json" 
+@using "./Env.cfg"
+
+# Import all the key/value pairs with ".*"
+PingFederateService.*
+Serilog.*
+SecurityEdgeService.*
+
+# Import specific key/value pairs by referencing them
+MerchantVerificationUri
+
+# Set imported values like this
+PingFederateService.Client_ID = "UnderwritingResults"
+PingFederateService.Client_Secret = "${uwresultsSecret}"
+
+# Variables are used for various purposes
+# For example, in Defaults.json, appName could be used like this:
+# "Serilog": {
+#   "WriteTo": {
+#     "Name": "File",
+#     "Args": { "path": "./logs/{$appName}.json"}
+#   }
+# }
+# To set this, use the variables object
+# If there are no variables, or that variable does not exist
+# you will get an error!
+Serilog.variables.appName = "UnderwritingResultsAPI"
+Serilog.variables.useEnrichers = true
+
+# Edge service Access Key variables
+# values are secrets, replaced by the build process as usual
+SecurityEdgeService.AccessKey = "${uwresultsAK}"
+SecurityEdgeService.SigningKey = "${uwresultsSigningKey}"
+
+# New Uri introduced in this file
+# Provide different values for each env, using the env header
+[dev]
+HierarchyBaseUri = "https://boarding-dev.clearent.net",
+
+[qa]
+HierarchyBaseUri = "https://boarding-qa.clearent.net",
+
+[sb]
+HierarchyBaseUri = "https://boarding-sb.clearent.net",
+
+[prod-lnx, prod-stl]
+HierarchyBaseUri = "https://boarding.clearent.net",
+
+# Or maybe use env specific mixins/functions
+# env_specific_url() would append the env name to the subdomain
+HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
+
+# Or maybe inject env names like a variable
+HierarchyBaseUri = "https://boarding{$env}.clearent.net"
+
+[HealthCheckSettings.HealthCheckTasks]
+Type = SQLDatabase
+Name = "ClearentDatabaseConnection"
+ConnectionString = "${ConnectionStrings:ClearentConnectionString}"
+
+[HealthCheckSettings.HealthCheckTasks]
+Type = SQLDatabase
+Name = "MerchantVerificationDatabaseConnection"
+ConnectionString = "${ConnectionStrings:MerchantVerification}"
+      
+[HealthCheckSettings.HealthCheckTasks]
+Type = CustomCode
+Name = "CryptoApi"
+IntervalBetweenRunInSeconds = 120
+Description = "Custom Health Check for Crypto API"
+Settings = {
+  ShouldReturnFullStatusReportToInfo = true,
+  CryptoApiUrl = "${SettlementCryptoBaseUri}"
+}

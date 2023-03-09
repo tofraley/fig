@@ -1,0 +1,57 @@
+﻿@import { 
+  Serilog,
+  MerchantDemographicsUri,
+  MerchantLifecycleStatusUri,
+  MerchantVerificationUri,
+  EdocsUri,
+  HealthCheckSettings,
+  SecuredClientSettings, 
+} from "../Defaults.json"
+@import * from "../Env.cfg"
+
+# Variables imported from other configs
+
+# Serilog variables
+Serilog.appName: "UnderwritingResultsAPI"
+Serilog.useEnrichers: true
+
+# Ping variables
+PingFederateService.Client_ID: "UnderwritingResults",
+PingFederateService.Client_Secret: "${uwresultsSecret}"
+
+# Edge service Access Key variables
+# values are secrets, replaced by the build process as usual
+SecurityEdgeService.AccessKey: "${uwresultsAK}",
+SecurityEdgeService.SigningKey: "${uwresultsSigningKey}"
+
+# New Uri introduced in this file
+# provides different values for each environment
+HierarchyBaseUri: [dev]"https://boarding-dev.clearent.net",
+                  [qa]"https://boarding-qa.clearent.net",
+                  [sb]"https://boarding-sb.clearent.net",
+                  [prod-lnx, prod-stl]"https://boarding.clearent.net",
+
+# Health checks
+HealthCheckSettings
+  .HealthCheckTasks: [
+      {
+        Type: SQLDatabase,
+        Name: "ClearentDatabaseConnection",
+        ConnectionString: "${ConnectionStrings:ClearentConnectionString}"
+      },
+      {
+        Type: SQLDatabase,
+        Name: "MerchantVerificationDatabaseConnection",
+        ConnectionString: "${ConnectionStrings:MerchantVerification}"
+      },
+      {
+        Type: CustomCode,
+        Name: "CryptoApi",
+        IntervalBetweenRunInSeconds: 120,
+        Description: "Custom Health Check for Crypto API",
+        Settings: {
+          "ShouldReturnFullStatusReportToInfo": true,
+          "CryptoApiUrl": "${SettlementCryptoBaseUri}"
+        }
+      }
+    ]

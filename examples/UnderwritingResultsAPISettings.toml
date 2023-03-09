@@ -1,0 +1,62 @@
+﻿@using "./Defaults.json" 
+@using "./Env.cfg"
+
+# Variables imported from other configs
+
+# Use all the key/values from Serilog with ".*"
+# Set specific key/values or fig variables from Serilog under the header
+[Serilog.*]
+appName = "UnderwritingResultsAPI"
+useEnrichers = true
+
+# Ping variables
+[PingFederateService.*]
+Client_ID = "UnderwritingResults"
+Client_Secret = "${uwresultsSecret}"
+
+# Edge service Access Key variables
+# values are secrets, replaced by the build process as usual
+[SecurityEdgeService.*]
+AccessKey = "${uwresultsAK}"
+SigningKey = "${uwresultsSigningKey}"
+
+# New Uri introduced in this file
+# Provide different values for each env, using the env header
+[dev]
+HierarchyBaseUri = "https://boarding-dev.clearent.net",
+
+[qa]
+HierarchyBaseUri = "https://boarding-qa.clearent.net",
+
+[sb]
+HierarchyBaseUri = "https://boarding-sb.clearent.net",
+
+[prod-lnx, prod-stl]
+HierarchyBaseUri = "https://boarding.clearent.net",
+
+# Or maybe use env specific mixins/functions
+# env_specific_url() would append the env name to the subdomain
+HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
+
+# Or maybe inject env names like a variable
+HierarchyBaseUri = "https://boarding{$env}.clearent.net"
+
+[HealthCheckSettings.HealthCheckTasks]
+Type = SQLDatabase
+Name = "ClearentDatabaseConnection"
+ConnectionString = "${ConnectionStrings:ClearentConnectionString}"
+
+[HealthCheckSettings.HealthCheckTasks]
+Type = SQLDatabase
+Name = "MerchantVerificationDatabaseConnection"
+ConnectionString = "${ConnectionStrings:MerchantVerification}"
+      
+[HealthCheckSettings.HealthCheckTasks]
+Type = CustomCode
+Name = "CryptoApi"
+IntervalBetweenRunInSeconds = 120
+Description = "Custom Health Check for Crypto API"
+Settings = {
+  ShouldReturnFullStatusReportToInfo = true,
+  CryptoApiUrl = "${SettlementCryptoBaseUri}"
+}
