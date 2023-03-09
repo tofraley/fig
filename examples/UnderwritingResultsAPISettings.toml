@@ -39,7 +39,7 @@ HierarchyBaseUri = "https://boarding.clearent.net",
 HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
 
 # Or maybe inject env names like a variable
-HierarchyBaseUri = "https://boarding{$env}.clearent.net"
+HierarchyBaseUri = "https://boarding${env}.clearent.net"
 
 [HealthCheckSettings.HealthCheckTasks]
 Type = SQLDatabase
