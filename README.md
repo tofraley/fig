@@ -24,7 +24,7 @@ Fig will create a file for each environment. Environments are defined in Env.fig
 
 Set imported values using dot notation.
 
-```
+```python
 LogSettings.Level = "Information"
 ```
 
