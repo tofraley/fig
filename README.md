@@ -197,11 +197,11 @@ For example, what if we want to make sure urls use one of a list of domains.
 So this would work:
 
 ```
-MyUrl = "https://compass.clearent.net"
+CompassUrl = "https://compass.clearent.net"
 ```
 
 But this would error:
 
 ```
-MyUrl = "https://copmass.clearent.net"
+CompassUrl = "https://copmass.clearent.net"
 ```
