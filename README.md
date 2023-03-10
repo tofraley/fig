@@ -109,8 +109,8 @@ For example, in **DefaultSettings.json**, a variable called appName might be use
 
 ```json
 "LogSettings": {
- "WriteTo": "File",
- "Args": { "path": "./logs/${appName}.json" }
+  "WriteTo": "File",
+  "Args": { "path": "./logs/${appName}.json" }
 }
 ```
 
