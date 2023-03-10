@@ -1,23 +1,95 @@
-﻿### Importing
+﻿### Introduction
+
+Fig is a language that you write configs in.
+
+It makes it easy to manage configs for multiple environments, share configs, and navigate between shared configs.
+
+Fig then takes your configs and generates equivalent json files to be used by your programs. A different file will be generated for each environment.
+
+### Legend
+
+🧪 - Experimental, check back frequently
+
+### Sample
+
+```python
+@import
+  from "./DefaultSettings.json"
+    LogSettings.*
+    SecurityService.*
+    HealthCheckSettings.*
+    SomeUrl
+
+  from "./BoardingFeatures.json"
+    AwesomeFeature
+    ExperimentFeature
+
+  from "./Utils.fig"
+    env_specific_url
+
+@environments from "./Env.fig"
+
+LogSettings.Level = "Information"
+
+LogSettings.variables
+  appName = "UnderwritingResultsAPI"
+  useEnrichers = true
+
+SecurityService
+  AccessKey = "${accessKey}"
+  SecurityEdgeService.SigningKey = "${signingKey}"
+
+ExperimentFeature =
+  @dev=true
+  @qa=true
+
+HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
+
+HealthCheckSettings.HealthCheckTasks = [
+  {
+    Type = SQLDatabase
+    Name = "ClearentDatabaseConnection"
+    ConnectionString = "${ConnectionStrings:ClearentConnectionString}"
+  },
+  {
+    Type = SQLDatabase
+    Name = "MerchantVerificationDatabaseConnection"
+    ConnectionString = "${ConnectionStrings:MerchantVerification}"
+  },
+]
+```
+
+### Importing
 
 Import settings from another file. This could be fig, json, or toml.
 
 ```js
 @import {
-  LogSettings.*,
-  AuthService.*,
-  SecurityService.*,
-  HealthCheckSettings.*,
+  LogSettings.*
+  SecurityService.*
+  HealthCheckSettings.*
   SendgridUri,
 } from "./DefaultSettings.json"
 ```
 
-### Environments
+Want to set a feature flag in one place, but reference it in multiple files?
+
+```
+@import NewAwesomeFeature from "./BoardingFeatures.json"
+```
+
+Want to set that feature flag differently in just this file?
+
+```python
+NewAwesomeFeature = false
+```
+
+### Environments 🧪
 
 Fig will create a file for each environment. Environments are defined in Env.fig.
 
 ```js
-@import { env } from "./Env.fig"
+@fig_env from "./Env.fig"
 ```
 
 ### Settings
@@ -86,7 +158,7 @@ HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
 
 ```
 
-### Arrays... still workshopping this one 😜
+### Arrays 🧪
 
 ```python
 HealthCheckSettings.HealthCheckTasks = [
