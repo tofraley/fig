@@ -1,14 +1,8 @@
 ﻿### Introduction
 
-Fig is a language that you write configs in.
+Fig is a language that you write configs in. It has a minimal syntax, and tries to make it easy to manage configs for multiple environments, share configs, and navigate between shared configs.
 
-It makes it easy to manage configs for multiple environments, share configs, and navigate between shared configs.
-
-Fig then takes your configs and generates equivalent json files to be used by your programs. A different file will be generated for each environment.
-
-### Legend
-
-🧪 - Experimental, check back frequently
+The Fig compiler then takes your configs and generates equivalent json files to be used by your programs. A different file will be generated for each environment.
 
 ### Sample
 
@@ -59,6 +53,10 @@ HealthCheckSettings.HealthCheckTasks = [
 ]
 ```
 
+### Legend
+
+🧪 - Experimental, check back frequently
+
 ### Importing
 
 Import settings from another file. This could be fig, json, or toml.
@@ -78,18 +76,14 @@ Want to set a feature flag in one place, but reference it in multiple files?
 @import NewAwesomeFeature from "./BoardingFeatures.json"
 ```
 
-Want to set that feature flag differently in just this file?
-
-```python
-NewAwesomeFeature = false
-```
+Want to set that feature flag differently in just this file? It's just an imported setting. See the [Settings](#settings).
 
 ### Environments 🧪
 
 Fig will create a file for each environment. Environments are defined in Env.fig.
 
 ```js
-@fig_env from "./Env.fig"
+@environments from "./Env.fig"
 ```
 
 ### Settings
