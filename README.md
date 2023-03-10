@@ -14,9 +14,9 @@ The Fig compiler then takes your configs and generates equivalent json files to 
     HealthCheckSettings.*
     SomeUrl
 
-  from "./BoardingFeatures.json"
+  from "./Features.json"
     AwesomeFeature
-    ExperimentFeature
+    ExperimentalFeature
 
   from "./Utils.fig"
     env_specific_url
@@ -26,29 +26,29 @@ The Fig compiler then takes your configs and generates equivalent json files to 
 LogSettings.Level = "Information"
 
 LogSettings.variables
-  appName = "UnderwritingResultsAPI"
+  appName = "PokemonAPI"
   useEnrichers = true
 
 SecurityService
   AccessKey = "${accessKey}"
   SecurityEdgeService.SigningKey = "${signingKey}"
 
-ExperimentFeature =
+ExperimentalFeature =
   @dev=true
   @qa=true
 
-HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
+HierarchyBaseUri = @env_specific_url("https://boarding.poke-app.net")
 
 HealthCheckSettings.HealthCheckTasks = [
   {
     Type = SQLDatabase
-    Name = "ClearentDatabaseConnection"
-    ConnectionString = "${ConnectionStrings:ClearentConnectionString}"
+    Name = "Database1"
+    ConnectionString = "${ConnectionString1}"
   },
   {
     Type = SQLDatabase
-    Name = "MerchantVerificationDatabaseConnection"
-    ConnectionString = "${ConnectionStrings:MerchantVerification}"
+    Name = "Database2"
+    ConnectionString = "${ConnectionString2}"
   },
 ]
 ```
@@ -73,7 +73,7 @@ Import settings from another file. This could be fig, json, or toml.
 Use a feature flag created in another file. When you're ready to turn it on, you just have to change it in one place!
 
 ```js
-@import NewAwesomeFeature from "./BoardingFeatures.json"
+@import NewAwesomeFeature from "./Features.json"
 ```
 
 But of course you can set it in this file just like any other imported setting. See the section on [Settings](#settings).
@@ -108,19 +108,17 @@ Variables are used for various purposes.
 For example, in **DefaultSettings.json**, a variable called appName might be used like this:
 
 ```json
-"Serilog": {
- "WriteTo": {
-   "Name": "File",
-   "Args": { "path": "./logs/${appName}.json"}
- }
+"LogSettings": {
+ "WriteTo": "File",
+ "Args": { "path": "./logs/${appName}.json" }
 }
 ```
 
 We can set this from our Fig file with the variables object.
 
 ```python
-Serilog.variables
-  appName = "UnderwritingResultsAPI"
+LogSettings.variables
+  appName = "PokemonAPI"
   useEnrichers = true
 ```
 
@@ -141,13 +139,13 @@ Or inject env names like a variable. Here, `$env` becomes the environment name (
 
 ```python
 $env_modifier = "-" + $env
-HierarchyBaseUri = "https://boarding${env_modifier}.clearent.net"
+BoardingUrl = "https://boarding${env_modifier}.poke-app.net"
 ```
 
 Or define your own functions and use them. Here, `env_specific_url()` appends the env name to the subdomain.
 
 ```python
-HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
+BoardingUrl = @env_specific_url("https://boarding.poke-app.net")
 
 ```
 
@@ -157,24 +155,14 @@ HierarchyBaseUri = @env_specific_url("https://boarding.clearent.net")
 HealthCheckSettings.HealthCheckTasks = [
   {
     Type = SQLDatabase
-    Name = "ClearentDatabaseConnection"
-    ConnectionString = "${ConnectionStrings:ClearentConnectionString}"
+    Name = "Database1"
+    ConnectionString = "${ConnectionString1}"
   },
   {
     Type = SQLDatabase
-    Name = "MerchantVerificationDatabaseConnection"
-    ConnectionString = "${ConnectionStrings:MerchantVerification}"
+    Name = "Database2"
+    ConnectionString = "${ConnectionString2}"
   },
-  {
-    Type = CustomCode
-    Name = "CryptoApi"
-    IntervalBetweenRunInSeconds = 120
-    Description = "Custom Health Check for Crypto API"
-    Settings = {
-      ShouldReturnFullStatusReportToInfo = true,
-      CryptoApiUrl = "${SettlementCryptoBaseUri}"
-    }
-  }
 ]
 ```
 
@@ -197,11 +185,11 @@ For example, what if we want to make sure urls use one of a list of domains.
 So this would work:
 
 ```
-CompassUrl = "https://compass.clearent.net"
+BoardingUrl = "https://boarding.poke-app.net"
 ```
 
 But this would error:
 
 ```
-CompassUrl = "https://copmass.clearent.net"
+BoardingUrl = "https://some.other-url.net"
 ```
