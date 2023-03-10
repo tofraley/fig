@@ -1,4 +1,8 @@
-﻿@import {
+﻿# Import a key/value pair by referencing the key.
+# If the value is a block/object, referencing the key will
+# bring it into scope, but not import all subsettings.
+# To import all subsettings as they are, add ".*"
+@import {
   PingFederateService.*
   Serilog.*
   SecurityEdgeService.*
@@ -8,11 +12,7 @@
 
 # Env.fig will define the environments
 # Fig will create a file for each environment
-@import { env } from "./Env.fig"
-
-# Import all the key/value pairs with ".*"
-
-# Import specific key/value pairs by referencing them
+@env from "./Env.fig"
 
 # Set imported values like this
 PingFederateService.Client_ID = "UnderwritingResults"
@@ -21,7 +21,7 @@ PingFederateService.Client_Secret = "${uwresultsSecret}"
 # Or like this
 # Notice these values are secrets, replaced with variables
 # by the build process as usual
-SecurityEdgeService
+SecurityEdgeService 
   AccessKey = "${uwresultsAK}"
   SecurityEdgeService.SigningKey = "${uwresultsSigningKey}"
 
@@ -44,7 +44,7 @@ Serilog.variables
 
 # Provide different values for each env, using the env header
 Features
-  UseNewFeature = [ env.dev=true, env.qa=true ]
+  UseNewFeature (dev, qa) = true 
 
 # Or inject env names like a variable
 # Here, "env" becomes the env name ("dev", "qa", etc)

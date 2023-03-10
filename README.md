@@ -1,4 +1,4 @@
-﻿### Introduction
+﻿## Introduction
 
 Fig is a language that you write configs in. It has a minimal syntax, and tries to make it easy to manage configs for multiple environments, share configs, and navigate between shared configs.
 
@@ -53,7 +53,7 @@ HealthCheckSettings.HealthCheckTasks = [
 ]
 ```
 
-### Legend
+## Features
 
 🧪 - Experimental, check back frequently
 
@@ -62,25 +62,25 @@ HealthCheckSettings.HealthCheckTasks = [
 Import settings from another file. This could be fig, json, or toml.
 
 ```js
-@import {
-  LogSettings.*
-  SecurityService.*
-  HealthCheckSettings.*
-  SendgridUri,
-} from "./DefaultSettings.json"
+@import
+  from "./DefaultSettings.json"
+    LogSettings.*
+    SecurityService.*
+    HealthCheckSettings.*
+    SomeUrl
 ```
 
-Want to set a feature flag in one place, but reference it in multiple files?
+Use a feature flag created in another file. When you're ready to turn it on, you just have to change it in one place!
 
-```
+```js
 @import NewAwesomeFeature from "./BoardingFeatures.json"
 ```
 
-Want to set that feature flag differently in just this file? It's just an imported setting. See the [Settings](#settings).
+But of course you can set it in this file just like any other imported setting. See the section on [Settings](#settings).
 
 ### Environments 🧪
 
-Fig will create a file for each environment. Environments are defined in Env.fig.
+Fig will generate a json file for each environment. Configure your environments like this.
 
 ```js
 @environments from "./Env.fig"
@@ -97,16 +97,15 @@ LogSettings.Level = "Information"
 Or indent them for better readability.
 
 ```python
-SecurityService
-  AccessKey = "${uwresultsAK}"
-  SecurityEdgeService.SigningKey = "${uwresultsSigningKey}"
+LogSettings
+  Level = "Information"
+  WriteTo = "File"
 ```
-
-Notice these values are secrets, replaced with variables by the build process as usual.
 
 ### Variables
 
-Variables are used for various purposes. For example, in **DefaultSettings.json**, a variable called appName could be used like this:
+Variables are used for various purposes.
+For example, in **DefaultSettings.json**, a variable called appName might be used like this:
 
 ```json
 "Serilog": {
@@ -117,7 +116,7 @@ Variables are used for various purposes. For example, in **DefaultSettings.json*
 }
 ```
 
-We can set this from our fig file with the variables object.
+We can set this from our Fig file with the variables object.
 
 ```python
 Serilog.variables
@@ -177,4 +176,32 @@ HealthCheckSettings.HealthCheckTasks = [
     }
   }
 ]
+```
+
+## Future features
+
+### Enums 🧪
+
+It would be nice to have some type safe options instead of strings.
+
+```python
+LogSettings.WriteTo = LogLocations.File
+```
+
+### Validated settings 🧪
+
+What if we could define validators to make sure imported settings are used correctly.
+
+For example, what if we want to make sure urls use one of a list of domains.
+
+So this would work:
+
+```
+MyUrl = "https://compass.clearent.net"
+```
+
+But this would error:
+
+```
+MyUrl = "https://copmass.clearent.net"
 ```
